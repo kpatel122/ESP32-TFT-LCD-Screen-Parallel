@@ -33,8 +33,11 @@
 * FROM THE CONTENT OF SUCH FIRMWARE AND/OR THE USE MADE BY CUSTOMERS OF THE 
 * CODING INFORMATION CONTAINED HEREIN IN CONNECTION WITH THEIR PRODUCTS.
 **********************************************************************************/
-#define LCD_MODE 1    //1-8bit,0-16bit
+//#define LCD_MODE 1    //1-8bit,0-16bit
 
+
+/*dont use pins 6-11 on esp32*/
+/*do use pins <32 so writes can be done on single register */
 #define LCD_RD   23
 #define LCD_WR   22     
 #define LCD_RS   21        
@@ -115,9 +118,7 @@ void initPins()
 }
 
  
-//#define Lcd_Writ_Bus(d) tft_Write_8(d)  WR_L;  WR_H; //this doen't work should be debugged  
-
-
+//#define Lcd_Writ_Bus(d) tft_Write_8(d)  WR_L;  WR_H; //this doen't work should be debugged-use the inline function instead
 inline void Lcd_Writ_Bus(unsigned int d)
 {
     tft_Write_8(d);
@@ -325,27 +326,20 @@ void LCD_Clear(unsigned int j)
     for(m=0;m<480;m++)
     {
       //Lcd_Write_Data(j>>8);
-      #if LCD_MODE
+      //#if LCD_MODE
         Lcd_Write_Data(j>>8);
-      #endif
+      //#endif
       Lcd_Write_Data(j);
     }
   digitalWrite(LCD_CS,HIGH);   
 }
 
 void setup()
-{/*
-  for(int p=0;p<10;p++)
-  {
-    pinMode(p,OUTPUT);
-  }*/
+{
 
   initPins();
   CONSTRUCTOR_INIT_TFT_DATA_BUS
-  
-  //DDRA = B11111111;//|= 0xFF;
-  //DDRC = B11111111; //|= 0xFF;
-  
+ 
   for(int x=0;x<8;x++)
   {
     pinMode(pins[x],OUTPUT);
@@ -380,5 +374,5 @@ void loop()
     Rect(random(300),random(300),random(300),random(300),random(65535)); // rectangle at x, y, with, hight, color
   }
   */
-//  LCD_Clear(0xf800);
+
 }
