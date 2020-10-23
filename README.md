@@ -1,5 +1,5 @@
 # ESP32-TFT-LCD-Screen-Parallel
-480 * 320 TFT LCD Screen with ESP32 using parallel communication
+480 * 320 TFT LCD Screen (ST7796S driver) with ESP32 using parallel communication
 
 ![Alt Text](https://raw.github.com/kpatel122/ESP32-TFT-LCD-Screen-Parallel/main/docs/pics/esp32.png)
 ![Alt Text](https://raw.github.com/kpatel122/ESP32-TFT-LCD-Screen-Parallel/main/docs/pics/screen0.jpg)
