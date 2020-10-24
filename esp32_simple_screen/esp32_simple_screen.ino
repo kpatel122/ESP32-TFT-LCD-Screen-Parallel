@@ -57,6 +57,7 @@
 
 unsigned int pins[8];
 
+
 /*eSPI Library*/
 
  // Bit masks for ESP32 parallel bus interface
@@ -67,8 +68,6 @@ unsigned int pins[8];
                            // see commented out #define set_mask(C) within TFT_eSPI_ESP32.h
 
                            
-#define WR_L GPIO.out_w1tc = (1 << LCD_WR)
-#define WR_H GPIO.out_w1ts = (1 << LCD_WR)
 
 // Create a bit set lookup table for data bus - wastes 1kbyte of RAM but speeds things up dramatically
   // can then use e.g. GPIO.out_w1ts = set_mask(0xFF); to set data bus to 0xFF
@@ -117,8 +116,20 @@ void initPins()
   pins[7] = LCD_D7;//13; //DB7
 }
 
+#define WR_L GPIO.out_w1tc = (1 << LCD_WR)
+#define WR_H GPIO.out_w1ts = (1 << LCD_WR)
+
+#define RS_C GPIO.out_w1tc = (1 << LCD_RS); GPIO.out_w1tc = (1 << LCD_RS)
+#define RS_D GPIO.out_w1ts = (1 << LCD_RS); GPIO.out_w1ts = (1 << LCD_RS)
+
+#define CS_L GPIO.out_w1tc = (1 << LCD_CS)
+#define CS_H GPIO.out_w1ts = (1 << LCD_CS)
+
+
+//#define WR_H GPIO.out_w1tc = (1 << LCD_WR); GPIO.out_w1tc = (1 << LCD_WR); GPIO.out_w1tc = (1 << LCD_WR); GPIO.out_w1tc = (1 << LCD_WR); GPIO.out_w1ts = (1 << LCD_WR); GPIO.out_w1ts = (1 << LCD_WR); GPIO.out_w1ts = (1 << LCD_WR)
  
 //#define Lcd_Writ_Bus(d) tft_Write_8(d)  WR_L;  WR_H; //this doen't work should be debugged-use the inline function instead
+
 inline void Lcd_Writ_Bus(unsigned int d)
 {
     tft_Write_8(d);
@@ -129,15 +140,13 @@ inline void Lcd_Writ_Bus(unsigned int d)
 
 void Lcd_Write_Com(unsigned int VH)  
 {   
-  //*(portOutputRegister(digitalPinToPort(LCD_RS))) &=  ~digitalPinToBitMask(LCD_RS);//LCD_RS=0;
-  digitalWrite(LCD_RS,LOW);
+  RS_C;
   Lcd_Writ_Bus(VH);
 }
 
 void Lcd_Write_Data(unsigned int VH)
 {
-  //*(portOutputRegister(digitalPinToPort(LCD_RS)))|=  digitalPinToBitMask(LCD_RS);//LCD_RS=1;
-  digitalWrite(LCD_RS,HIGH);
+  RS_D;
   Lcd_Writ_Bus(VH);
 }
 
@@ -263,10 +272,13 @@ void Lcd_Init(void)
 
 void H_line(unsigned int x, unsigned int y, unsigned int l, unsigned int c)                   
 { 
+
   unsigned int i,j;
   Lcd_Write_Com(0x02c); //write_memory_start
-  digitalWrite(LCD_RS,HIGH);
-  digitalWrite(LCD_CS,LOW);
+
+  RS_D;
+  CS_L;
+  
   l=l+x;
   Address_set(x,y,l,y);
   j=l*2;
@@ -274,15 +286,18 @@ void H_line(unsigned int x, unsigned int y, unsigned int l, unsigned int c)
   {
     Lcd_Write_Data(c);
   }
-  digitalWrite(LCD_CS,HIGH);   
+  CS_H;
+  
 }
 
 void V_line(unsigned int x, unsigned int y, unsigned int l, unsigned int c)                   
 { 
   unsigned int i,j;
   Lcd_Write_Com(0x02c); //write_memory_start
-  digitalWrite(LCD_RS,HIGH);
-  digitalWrite(LCD_CS,LOW);
+
+  RS_D;
+  CS_L;
+  
   l=l+y;
   Address_set(x,y,x,l);
   j=l*2;
@@ -290,7 +305,8 @@ void V_line(unsigned int x, unsigned int y, unsigned int l, unsigned int c)
   { 
     Lcd_Write_Data(c);
   }
-  digitalWrite(LCD_CS,HIGH);   
+  CS_H;
+
 }
 
 void Rect(unsigned int x,unsigned int y,unsigned int w,unsigned int h,unsigned int c)
@@ -317,21 +333,16 @@ void LCD_Clear(unsigned int j)
 { 
   unsigned int i,m;
  Address_set(0,0,320,480);
-  //Lcd_Write_Com(0x02c); //write_memory_start
-  //digitalWrite(LCD_RS,HIGH);
-  digitalWrite(LCD_CS,LOW);
-
-
+  CS_L;
+  
   for(i=0;i<320;i++)
     for(m=0;m<480;m++)
     {
-      //Lcd_Write_Data(j>>8);
-      //#if LCD_MODE
-        Lcd_Write_Data(j>>8);
-      //#endif
+      Lcd_Write_Data(j>>8);
       Lcd_Write_Data(j);
     }
-  digitalWrite(LCD_CS,HIGH);   
+
+  CS_H;   
 }
 
 void setup()
@@ -366,13 +377,16 @@ void loop()
    LCD_Clear(0xf800);
    LCD_Clear(0x07E0);
    LCD_Clear(0x001F);
+
    
    /*
-    LCD_Clear(0xf800);
+  LCD_Clear(0xf800);
+    
   for(int i=0;i<1000;i++)
   {
     Rect(random(300),random(300),random(300),random(300),random(65535)); // rectangle at x, y, with, hight, color
   }
   */
+  
 
 }
