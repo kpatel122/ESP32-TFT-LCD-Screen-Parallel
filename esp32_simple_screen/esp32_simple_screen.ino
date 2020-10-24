@@ -99,25 +99,10 @@ unsigned int pins[8];
                         (((C)&0x08)>>3)<<TFT_D3 | (((C)&0x04)>>2)<<TFT_D2 | (((C)&0x02)>>1)<<TFT_D1 | (((C)&0x01)>>0)<<TFT_D0
   //*/
 
-  // Write 8 bits to TFT
-  #define tft_Write_8(C)  GPIO.out_w1tc = clr_mask; GPIO.out_w1ts = set_mask((uint8_t)(C));//WR_H
+// Write 8 bits to TFT
+#define tft_Write_8(C)  GPIO.out_w1tc = clr_mask; GPIO.out_w1ts = set_mask((uint8_t)(C));//WR_H
 
 
-
-void initPins()
-{
-  pins[0] = LCD_D0;//32; //DB0
-  pins[1] = LCD_D1;//33; //DB1
-  pins[2] = LCD_D2;//25; //DB2
-  pins[3] = LCD_D3;//26; //DB3
-  pins[4] = LCD_D4;//27; //DB4
-  pins[5] = LCD_D5;//14; //DB5
-  pins[6] = LCD_D6;//12; //DB6
-  pins[7] = LCD_D7;//13; //DB7
-}
-
-#define WR_L GPIO.out_w1tc = (1 << LCD_WR)
-#define WR_H GPIO.out_w1ts = (1 << LCD_WR)
 
 #define RS_C GPIO.out_w1tc = (1 << LCD_RS); GPIO.out_w1tc = (1 << LCD_RS)
 #define RS_D GPIO.out_w1ts = (1 << LCD_RS); GPIO.out_w1ts = (1 << LCD_RS)
@@ -126,17 +111,22 @@ void initPins()
 #define CS_H GPIO.out_w1ts = (1 << LCD_CS)
 
 
-//#define WR_H GPIO.out_w1tc = (1 << LCD_WR); GPIO.out_w1tc = (1 << LCD_WR); GPIO.out_w1tc = (1 << LCD_WR); GPIO.out_w1tc = (1 << LCD_WR); GPIO.out_w1ts = (1 << LCD_WR); GPIO.out_w1ts = (1 << LCD_WR); GPIO.out_w1ts = (1 << LCD_WR)
- 
-//#define Lcd_Writ_Bus(d) tft_Write_8(d)  WR_L;  WR_H; //this doen't work should be debugged-use the inline function instead
+#define WR_L GPIO.out_w1tc = (1 << LCD_WR)
+#define WR_H GPIO.out_w1ts = (1 << LCD_WR)
 
+//#define WR_L GPIO.out_w1tc = (1 << LCD_WR); GPIO.out_w1tc = (1 << LCD_WR); GPIO.out_w1tc = (1 << LCD_WR); GPIO.out_w1tc = (1 << LCD_WR); GPIO.out_w1tc = (1 << LCD_WR); GPIO.out_w1tc = (1 << LCD_WR); GPIO.out_w1tc = (1 << LCD_WR)
+//#define WR_H GPIO.out_w1ts = (1 << LCD_WR); GPIO.out_w1ts = (1 << LCD_WR); GPIO.out_w1ts = (1 << LCD_WR); GPIO.out_w1ts = (1 << LCD_WR); GPIO.out_w1ts = (1 << LCD_WR); GPIO.out_w1ts = (1 << LCD_WR); GPIO.out_w1ts = (1 << LCD_WR)
+ 
+#define Lcd_Writ_Bus(d)  tft_Write_8(d) WR_L; WR_H;  
+
+/* use this if you are getting a white screen
 inline void Lcd_Writ_Bus(unsigned int d)
 {
     tft_Write_8(d);
     WR_L;  
     WR_H;
 }
-
+*/
 
 void Lcd_Write_Com(unsigned int VH)  
 {   
@@ -163,7 +153,7 @@ void Address_set(unsigned int x1,unsigned int y1,unsigned int x2,unsigned int y2
   Lcd_Write_Data(x1);
   Lcd_Write_Data(x2>>8);
   Lcd_Write_Data(x2);
-        Lcd_Write_Com(0x2b);
+  Lcd_Write_Com(0x2b);
   Lcd_Write_Data(y1>>8);
   Lcd_Write_Data(y1);
   Lcd_Write_Data(y2>>8);
@@ -343,6 +333,18 @@ void LCD_Clear(unsigned int j)
     }
 
   CS_H;   
+}
+
+void initPins()
+{
+  pins[0] = LCD_D0;//32; //DB0
+  pins[1] = LCD_D1;//33; //DB1
+  pins[2] = LCD_D2;//25; //DB2
+  pins[3] = LCD_D3;//26; //DB3
+  pins[4] = LCD_D4;//27; //DB4
+  pins[5] = LCD_D5;//14; //DB5
+  pins[6] = LCD_D6;//12; //DB6
+  pins[7] = LCD_D7;//13; //DB7
 }
 
 void setup()
