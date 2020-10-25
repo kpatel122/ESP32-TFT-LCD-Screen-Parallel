@@ -122,10 +122,6 @@ unsigned int pins[8];
                         (((C)&0x08)>>3)<<TFT_D3 | (((C)&0x04)>>2)<<TFT_D2 | (((C)&0x02)>>1)<<TFT_D1 | (((C)&0x01)>>0)<<TFT_D0
   //*/
 
-
-
-
-
 #define RS_C GPIO.out_w1tc = (1 << LCD_RS); GPIO.out_w1tc = (1 << LCD_RS)
 #define RS_D GPIO.out_w1ts = (1 << LCD_RS); GPIO.out_w1ts = (1 << LCD_RS)
 
@@ -139,35 +135,11 @@ unsigned int pins[8];
 #define WR_L GPIO.out_w1tc = (1 << LCD_WR)
 #define WR_H GPIO.out_w1ts = (1 << LCD_WR)
 
-//#define WR_L GPIO.out_w1tc = (1 << LCD_WR); GPIO.out_w1tc = (1 << LCD_WR); GPIO.out_w1tc = (1 << LCD_WR); GPIO.out_w1tc = (1 << LCD_WR); GPIO.out_w1tc = (1 << LCD_WR); GPIO.out_w1tc = (1 << LCD_WR); GPIO.out_w1tc = (1 << LCD_WR)
-//#define WR_H GPIO.out_w1ts = (1 << LCD_WR); GPIO.out_w1ts = (1 << LCD_WR); GPIO.out_w1ts = (1 << LCD_WR); GPIO.out_w1ts = (1 << LCD_WR); GPIO.out_w1ts = (1 << LCD_WR); GPIO.out_w1ts = (1 << LCD_WR); GPIO.out_w1ts = (1 << LCD_WR)
 
 
 // Write 8 bits to TFT
 #define tft_Write_8(C)  GPIO.out_w1tc = clr_mask; GPIO.out_w1ts = set_mask((uint8_t)(C));WR_L; WR_H;  //WR_H
 
-//#define Lcd_Writ_Bus(d)  tft_Write_8(d) WR_L; WR_H;  
-#define Lcd_Writ_Bus(C)  GPIO.out_w1tc = clr_mask; GPIO.out_w1ts = set_mask((uint8_t)(C)); WR_L; WR_H;  
-
-
-  // Write two concatenated 16 bit values to TFT
-/*
-void tft_Write_32C(int32_t C,int32_t D)
- {
-  GPIO.out_w1tc = clr_mask; GPIO.out_w1ts = set_mask((uint8_t) ((C) >> 8)); WR_L; WR_H; 
-  GPIO.out_w1tc = clr_mask; GPIO.out_w1ts = set_mask((uint8_t) ((C) >> 0)); WR_L; WR_H; 
-  GPIO.out_w1tc = clr_mask; GPIO.out_w1ts = set_mask((uint8_t) ((D) >> 8)); WR_L;WR_H; 
-  GPIO.out_w1tc = clr_mask; GPIO.out_w1ts = set_mask((uint8_t) ((D) >> 0)); WR_L; WR_H;
- }
-*/
-     // Write 16 bits to TFT
- /*
- void tft_Write_16(uint16_t C) 
- {
- GPIO.out_w1tc = clr_mask; GPIO.out_w1ts = set_mask((uint8_t) ((C) >> 8)); WR_L; WR_H; 
- GPIO.out_w1tc = clr_mask; GPIO.out_w1ts = set_mask((uint8_t) ((C) >> 0)); WR_L; WR_H;
- }
- */
  #define tft_Write_16(C) GPIO.out_w1tc = clr_mask; GPIO.out_w1ts = set_mask((uint8_t) ((C) >> 8)); WR_L;WR_H; \
                            GPIO.out_w1tc = clr_mask; GPIO.out_w1ts = set_mask((uint8_t) ((C) >> 0)); WR_L;WR_H
 
@@ -179,74 +151,7 @@ void tft_Write_32C(int32_t C,int32_t D)
                              GPIO.out_w1tc = clr_mask; GPIO.out_w1ts = set_mask((uint8_t) ((C) >> 0)); WR_L;WR_H; \
                              GPIO.out_w1tc = clr_mask; GPIO.out_w1ts = set_mask((uint8_t) ((D) >> 8)); WR_L;WR_H; \
                              GPIO.out_w1tc = clr_mask; GPIO.out_w1ts = set_mask((uint8_t) ((D) >> 0)); WR_L;WR_H
- 
- /*
- void tft_Write_32C(int32_t C,int32_t D)
- {
-  GPIO.out_w1tc = clr_mask; GPIO.out_w1ts = set_mask((uint8_t) ((C) >> 8)); WR_L; WR_H; 
-  GPIO.out_w1tc = clr_mask; GPIO.out_w1ts = set_mask((uint8_t) ((C) >> 0)); WR_L; WR_H; 
-  GPIO.out_w1tc = clr_mask; GPIO.out_w1ts = set_mask((uint8_t) ((D) >> 8)); WR_L;WR_H; 
-  GPIO.out_w1tc = clr_mask; GPIO.out_w1ts = set_mask((uint8_t) ((D) >> 0)); WR_L; WR_H;
- }
- */
 
-/* use this if you are getting a white screen
-inline void Lcd_Writ_Bus(unsigned int d)
-{
-    tft_Write_8(d);
-    WR_L;  
-    WR_H;
-}
-*/
-
-void Lcd_Write_Com(unsigned int VH)  
-{   
-  RS_C;
-  Lcd_Writ_Bus(VH);
-}
-
-void Lcd_Write_Data(unsigned int VH)
-{
-  RS_D;
-  Lcd_Writ_Bus(VH);
-}
-
-void Lcd_Write_Com_Data(unsigned int com,unsigned int dat)
-{
-  Lcd_Write_Com(com);
-  Lcd_Write_Data(dat);
-}
-
-
-
-
-// Generic commands used by TFT_eSPI.cpp
-/*
-#define TFT_NOP     0x00
-#define TFT_SWRST   0x01
-
-#define TFT_CASET   0x2A
-#define TFT_PASET   0x2B
-#define TFT_RAMWR   0x2C
-#define TFT_RAMRD   0x2E
-*/
-
-
-
-void Address_set(unsigned int x1,unsigned int y1,unsigned int x2,unsigned int y2)
-{
-  Lcd_Write_Com(0x2a);
-  Lcd_Write_Data(x1>>8);
-  Lcd_Write_Data(x1);
-  Lcd_Write_Data(x2>>8);
-  Lcd_Write_Data(x2);
-  Lcd_Write_Com(0x2b);
-  Lcd_Write_Data(y1>>8);
-  Lcd_Write_Data(y1);
-  Lcd_Write_Data(y2>>8);
-  Lcd_Write_Data(y2);
-  Lcd_Write_Com(0x2c);               
-}
 
 void setWindow(int32_t x0, int32_t y0, int32_t x1, int32_t y1)
 {
@@ -260,108 +165,6 @@ void setWindow(int32_t x0, int32_t y0, int32_t x1, int32_t y1)
   DC_D; tft_Write_32C(y0, y1);
   DC_C; tft_Write_8(TFT_RAMWR);
   DC_D;
-  
-}
-
-
-
-void eTFT_Init(void)
-{
-    Lcd_Write_Com(0x01); //Software reset
-  delay(120);
-
-  Lcd_Write_Com(0x11); //Sleep exit                                            
-  delay(120);
-
-  Lcd_Write_Com(0xF0); //Command Set control                                 
-  Lcd_Write_Data(0xC3);    //Enable extension command 2 partI
-  
-  Lcd_Write_Com(0xF0); //Command Set control                                 
-  Lcd_Write_Data(0x96);    //Enable extension command 2 partII
-  
-  Lcd_Write_Com(0x36); //Memory Data Access Control MX, MY, RGB mode                                    
-  Lcd_Write_Data(0x48);    //X-Mirror, Top-Left to right-Buttom, RGB  
-  
-  Lcd_Write_Com(0x3A); //Interface Pixel Format                                    
-  Lcd_Write_Data(0x55);    //Control interface color format set to 16
-  
-  
-  Lcd_Write_Com(0xB4); //Column inversion 
-  Lcd_Write_Data(0x01);    //1-dot inversion
-
-  Lcd_Write_Com(0xB6); //Display Function Control
-  Lcd_Write_Data(0x80);    //Bypass
-  Lcd_Write_Data(0x02);    //Source Output Scan from S1 to S960, Gate Output scan from G1 to G480, scan cycle=2
-  Lcd_Write_Data(0x3B);    //LCD Drive Line=8*(59+1)
-
-
-  Lcd_Write_Com(0xE8); //Display Output Ctrl Adjust
-  Lcd_Write_Data(0x40);
-  Lcd_Write_Data(0x8A); 
-  Lcd_Write_Data(0x00);
-  Lcd_Write_Data(0x00);
-  Lcd_Write_Data(0x29);    //Source eqaulizing period time= 22.5 us
-  Lcd_Write_Data(0x19);    //Timing for "Gate start"=25 (Tclk)
-  Lcd_Write_Data(0xA5);    //Timing for "Gate End"=37 (Tclk), Gate driver EQ function ON
-  Lcd_Write_Data(0x33);
-  
-  Lcd_Write_Com(0xC1); //Power control2                          
-  Lcd_Write_Data(0x06);    //VAP(GVDD)=3.85+( vcom+vcom offset), VAN(GVCL)=-3.85+( vcom+vcom offset)
-   
-  Lcd_Write_Com(0xC2); //Power control 3                                      
-  Lcd_Write_Data(0xA7);    //Source driving current level=low, Gamma driving current level=High
-   
-  Lcd_Write_Com(0xC5); //VCOM Control
-  Lcd_Write_Data(0x18);    //VCOM=0.9
-
-  delay(120);
-  
-  //ST7796 Gamma Sequence
-  Lcd_Write_Com(0xE0); //Gamma"+"                                             
-  Lcd_Write_Data(0xF0);
-  Lcd_Write_Data(0x09); 
-  Lcd_Write_Data(0x0b);
-  Lcd_Write_Data(0x06); 
-  Lcd_Write_Data(0x04);
-  Lcd_Write_Data(0x15); 
-  Lcd_Write_Data(0x2F);
-  Lcd_Write_Data(0x54); 
-  Lcd_Write_Data(0x42);
-  Lcd_Write_Data(0x3C); 
-  Lcd_Write_Data(0x17);
-  Lcd_Write_Data(0x14);
-  Lcd_Write_Data(0x18); 
-  Lcd_Write_Data(0x1B); 
-   
-  Lcd_Write_Com(0xE1); //Gamma"-"                                             
-  Lcd_Write_Data(0xE0);
-  Lcd_Write_Data(0x09); 
-  Lcd_Write_Data(0x0B);
-  Lcd_Write_Data(0x06); 
-  Lcd_Write_Data(0x04);
-  Lcd_Write_Data(0x03); 
-  Lcd_Write_Data(0x2B);
-  Lcd_Write_Data(0x43); 
-  Lcd_Write_Data(0x42);
-  Lcd_Write_Data(0x3B); 
-  Lcd_Write_Data(0x16);
-  Lcd_Write_Data(0x14);
-  Lcd_Write_Data(0x17); 
-  Lcd_Write_Data(0x1B);
-
-  delay(120);
-  
-  Lcd_Write_Com(0xF0); //Command Set control                                 
-  Lcd_Write_Data(0x3C);    //Disable extension command 2 partI
-
-  Lcd_Write_Com(0xF0); //Command Set control                                 
-  Lcd_Write_Data(0x69);    //Disable extension command 2 partII
-
-  CS_H;//end_tft_write();
-  delay(120);
-  CS_L;//begin_tft_write();
-
-  Lcd_Write_Com(0x29); //Display on  
   
 }
 
@@ -504,165 +307,6 @@ void Lcd_Init(void)
   writecommand(0X13);
   writecommand(0X11);
   writecommand(0X29);
-
-/*
-  Lcd_Write_Com(0xF0);
-  Lcd_Write_Data(0xC3);
-  Lcd_Write_Com(0xF0);
-  Lcd_Write_Data(0x96);
-  Lcd_Write_Com(0x36);
-  Lcd_Write_Data(0x68);  
-  Lcd_Write_Com(0x3A);
-  Lcd_Write_Data(0x05);  
-  Lcd_Write_Com(0xB0);
-  Lcd_Write_Data(0x80);  
-  Lcd_Write_Com(0xB6);
-  Lcd_Write_Data(0x20);
-  Lcd_Write_Data(0x02);  
-  Lcd_Write_Com(0xB5);
-  Lcd_Write_Data(0x02);
-  Lcd_Write_Data(0x03);
-  Lcd_Write_Data(0x00);
-  Lcd_Write_Data(0x04);
-  Lcd_Write_Com(0xB1);
-  Lcd_Write_Data(0x80);  
-  Lcd_Write_Data(0x10);  
-  Lcd_Write_Com(0xB4);
-  Lcd_Write_Data(0x00);
-  Lcd_Write_Com(0xB7);
-  Lcd_Write_Data(0xC6);
-  Lcd_Write_Com(0xC5);
-  Lcd_Write_Data(0x24);
-  Lcd_Write_Com(0xE4);
-  Lcd_Write_Data(0x31);
-  Lcd_Write_Com(0xE8);
-  Lcd_Write_Data(0x40);
-  Lcd_Write_Data(0x8A);
-  Lcd_Write_Data(0x00);
-  Lcd_Write_Data(0x00);
-  Lcd_Write_Data(0x29);
-  Lcd_Write_Data(0x19);
-  Lcd_Write_Data(0xA5);
-  Lcd_Write_Data(0x33);
-  Lcd_Write_Com(0xC2);
-  Lcd_Write_Com(0xA7);
-  
-  Lcd_Write_Com(0xE0);
-  Lcd_Write_Data(0xF0);
-  Lcd_Write_Data(0x09);
-  Lcd_Write_Data(0x13);
-  Lcd_Write_Data(0x12);
-  Lcd_Write_Data(0x12);
-  Lcd_Write_Data(0x2B);
-  Lcd_Write_Data(0x3C);
-  Lcd_Write_Data(0x44);
-  Lcd_Write_Data(0x4B);
-  Lcd_Write_Data(0x1B);
-  Lcd_Write_Data(0x18);
-  Lcd_Write_Data(0x17);
-  Lcd_Write_Data(0x1D);
-  Lcd_Write_Data(0x21);
-
-  Lcd_Write_Com(0XE1);
-  Lcd_Write_Data(0xF0);
-  Lcd_Write_Data(0x09);
-  Lcd_Write_Data(0x13);
-  Lcd_Write_Data(0x0C);
-  Lcd_Write_Data(0x0D);
-  Lcd_Write_Data(0x27);
-  Lcd_Write_Data(0x3B);
-  Lcd_Write_Data(0x44);
-  Lcd_Write_Data(0x4D);
-  Lcd_Write_Data(0x0B);
-  Lcd_Write_Data(0x17);
-  Lcd_Write_Data(0x17);
-  Lcd_Write_Data(0x1D);
-  Lcd_Write_Data(0x21);
-
-  Lcd_Write_Com(0X36);
-  Lcd_Write_Data(0x08);
-  Lcd_Write_Com(0xF0);
-  Lcd_Write_Data(0xC3);
-  Lcd_Write_Com(0xF0);
-  Lcd_Write_Data(0x69);
-  Lcd_Write_Com(0X13);
-  Lcd_Write_Com(0X11);
-  Lcd_Write_Com(0X29);
-  */
-}
-
-void H_line(unsigned int x, unsigned int y, unsigned int l, unsigned int c)                   
-{ 
-
-  unsigned int i,j;
-  Lcd_Write_Com(0x02c); //write_memory_start
-
-  RS_D;
-  CS_L;
-  
-  l=l+x;
-  Address_set(x,y,l,y);
-  j=l*2;
-  for(i=1;i<=j;i++)
-  {
-    Lcd_Write_Data(c);
-  }
-  CS_H;
-  
-}
-
-void V_line(unsigned int x, unsigned int y, unsigned int l, unsigned int c)                   
-{ 
-  unsigned int i,j;
-  Lcd_Write_Com(0x02c); //write_memory_start
-
-  RS_D;
-  CS_L;
-  
-  l=l+y;
-  Address_set(x,y,x,l);
-  j=l*2;
-  for(i=1;i<=j;i++)
-  { 
-    Lcd_Write_Data(c);
-  }
-  CS_H;
-
-}
-
-void Rect(unsigned int x,unsigned int y,unsigned int w,unsigned int h,unsigned int c)
-{
-  H_line(x  , y  , w, c);
-  H_line(x  , y+h, w, c);
-  V_line(x  , y  , h, c);
-  V_line(x+w, y  , h, c);
-}
-
-void Rectf(unsigned int x,unsigned int y,unsigned int w,unsigned int h,unsigned int c)
-{
-  unsigned int i;
-  for(i=0;i<h;i++)
-  {
-    H_line(x  , y  , w, c);
-    H_line(x  , y+i, w, c);
-  }
-}
-int RGB(int r,int g,int b)
-{return r << 16 | g << 8 | b;
-}
-void LCD_Clear(unsigned int j)                   
-{ 
-  unsigned int i,m;
- Address_set(0,0,320,480);
-  CS_L;
-
-  for(i=0;i<320;i++)
-    for(m=0;m<480;m++)
-    {
-      Lcd_Write_Data(j>>8);
-      Lcd_Write_Data(j);
-    }
-  CS_H;   
 }
 
 void initPins()
@@ -676,8 +320,6 @@ void initPins()
   pins[6] = LCD_D6;//12; //DB6
   pins[7] = LCD_D7;//13; //DB7
 }
- 
-
 
 inline void begin_tft_write(void){CS_L;}
 
@@ -727,7 +369,7 @@ void fillRect(int32_t x, int32_t y, int32_t w, int32_t h, uint32_t color)
   //Serial.print(", w=");Serial.print(w);Serial.print(", h=");Serial.println(h);
 
   
-begin_tft_write();
+  begin_tft_write();
   //Address_set(x, y, x + w - 1, y + h - 1);
   setWindow(x, y, x + w - 1, y + h - 1);
 
@@ -747,7 +389,6 @@ void setup()
     pinMode(pins[x],OUTPUT);
   }
   
-  
   pinMode(LCD_RS,OUTPUT);
   pinMode(LCD_WR,OUTPUT);
   pinMode(LCD_CS,OUTPUT);
@@ -760,34 +401,12 @@ void setup()
   digitalWrite(LCD_RD, HIGH);
  
   Lcd_Init();
- //LCD_Clear(0xf800);
+
 }
 
 void loop()
 {  
-  
-
-  //fillRect(0, 0, TFT_WIDTH, TFT_HEIGHT, 0xf800);
-  //delay(1000);
-  
-
   fillRect(0, 0, TFT_WIDTH, TFT_HEIGHT, 0xf800);
   fillRect(0, 0, TFT_WIDTH, TFT_HEIGHT, 0x07E0);
   fillRect(0, 0, TFT_WIDTH, TFT_HEIGHT, 0x001F);
-  
-  // LCD_Clear(0xf800);
-  // LCD_Clear(0x07E0);
-  // LCD_Clear(0x001F);
-
-   
-   /*
-  LCD_Clear(0xf800);
-    
-  for(int i=0;i<1000;i++)
-  {
-    Rect(random(300),random(300),random(300),random(300),random(65535)); // rectangle at x, y, with, hight, color
-  }
-  */
-  
-
 }
