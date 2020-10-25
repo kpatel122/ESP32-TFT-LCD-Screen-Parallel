@@ -365,6 +365,50 @@ void eTFT_Init(void)
   
 }
 
+/***************************************************************************************
+** Function name:           writecommand
+** Description:             Send an 8 bit command to the TFT
+***************************************************************************************/
+void writecommand(uint8_t c)
+{
+  DC_C;
+  tft_Write_8(c);
+  /*
+  begin_tft_write();
+
+  DC_C;
+
+  tft_Write_8(c);
+
+  DC_D;
+
+  end_tft_write();
+  */
+
+}
+
+
+/***************************************************************************************
+** Function name:           writedata
+** Description:             Send a 8 bit data value to the TFT
+***************************************************************************************/
+void writedata(uint8_t d)
+{
+  DC_D;
+  tft_Write_8(d);
+  /*
+  begin_tft_write();
+
+  DC_D;        // Play safe, but should already be in data mode
+
+  tft_Write_8(d);
+
+  CS_L;        // Allow more hold time for low VDI rail
+
+  end_tft_write();
+  */
+}
+
 void Lcd_Init(void)
 {
   digitalWrite(LCD_REST,HIGH);
@@ -378,10 +422,91 @@ void Lcd_Init(void)
   digitalWrite(LCD_WR,HIGH);
   digitalWrite(LCD_CS,LOW);  //CS
 
+   writecommand(0xF0);
+  writedata(0xC3);
+  writecommand(0xF0);
+  writedata(0x96);
+  writecommand(0x36);
+  writedata(0x68);  
+  writecommand(0x3A);
+  writedata(0x05);  
+  writecommand(0xB0);
+  writedata(0x80);  
+  writecommand(0xB6);
+  writedata(0x20);
+  writedata(0x02);  
+  writecommand(0xB5);
+  writedata(0x02);
+  writedata(0x03);
+  writedata(0x00);
+  writedata(0x04);
+  writecommand(0xB1);
+  writedata(0x80);  
+  writedata(0x10);  
+  writecommand(0xB4);
+  writedata(0x00);
+  writecommand(0xB7);
+  writedata(0xC6);
+  writecommand(0xC5);
+  writedata(0x24);
+  writecommand(0xE4);
+  writedata(0x31);
+  writecommand(0xE8);
+  writedata(0x40);
+  writedata(0x8A);
+  writedata(0x00);
+  writedata(0x00);
+  writedata(0x29);
+  writedata(0x19);
+  writedata(0xA5);
+  writedata(0x33);
+  writecommand(0xC2);
+  writecommand(0xA7);
   
+  writecommand(0xE0);
+  writedata(0xF0);
+  writedata(0x09);
+  writedata(0x13);
+  writedata(0x12);
+  writedata(0x12);
+  writedata(0x2B);
+  writedata(0x3C);
+  writedata(0x44);
+  writedata(0x4B);
+  writedata(0x1B);
+  writedata(0x18);
+  writedata(0x17);
+  writedata(0x1D);
+  writedata(0x21);
 
+  writecommand(0XE1);
+  writedata(0xF0);
+  writedata(0x09);
+  writedata(0x13);
+  writedata(0x0C);
+  writedata(0x0D);
+  writedata(0x27);
+  writedata(0x3B);
+  writedata(0x44);
+  writedata(0x4D);
+  writedata(0x0B);
+  writedata(0x17);
+  writedata(0x17);
+  writedata(0x1D);
+  writedata(0x21);
 
-    Lcd_Write_Com(0xF0);
+  writecommand(0X36);
+  writedata(0x08);
+  writecommand(0xF0);
+  writedata(0xC3);
+  writecommand(0xF0);
+  writedata(0x69);
+  writecommand(0X13);
+  writecommand(0X11);
+  writecommand(0X29);
+
+/*
+  Lcd_Write_Com(0xF0);
   Lcd_Write_Data(0xC3);
   Lcd_Write_Com(0xF0);
   Lcd_Write_Data(0x96);
@@ -463,7 +588,7 @@ void Lcd_Init(void)
   Lcd_Write_Com(0X13);
   Lcd_Write_Com(0X11);
   Lcd_Write_Com(0X29);
-  
+  */
 }
 
 void H_line(unsigned int x, unsigned int y, unsigned int l, unsigned int c)                   
